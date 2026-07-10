@@ -76,7 +76,7 @@ def parse_date_to_iso(text: str) -> Optional[str]:
         cand = cand.strip(' \t\n\r"\'.,:-/')
         if len(cand) >= 6:
             try:
-                dt = dateutil.parser.parse(cand, fuzzy=True, dayfirst=False)
+                dt = dateutil.parser.parse(cand, fuzzy=True, dayfirst=True)
                 if 2020 <= dt.year <= 2035:
                     return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d}"
             except Exception:
@@ -97,8 +97,8 @@ def parse_date_to_iso(text: str) -> Optional[str]:
         elif val2 > 12:
             return f"{y:04d}-{val1:02d}-{val2:02d}"
         else:
-            # Ambiguous: default to MM/DD/YYYY (month first)
-            return f"{y:04d}-{val1:02d}-{val2:02d}"
+            # Ambiguous: default to DD/MM/YYYY (day first)
+            return f"{y:04d}-{val2:02d}-{val1:02d}"
 
     # Pattern 2.3: MM-DD-YY or DD-MM-YY (2-digit year)
     m3 = re.search(r'\b(0?[1-9]|[12]\d|3[01])[-/.](0?[1-9]|[12]\d|3[01])[-/.](\d{2})\b', text)
@@ -110,7 +110,7 @@ def parse_date_to_iso(text: str) -> Optional[str]:
         elif val2 > 12:
             return f"{y:04d}-{val1:02d}-{val2:02d}"
         else:
-            return f"{y:04d}-{val1:02d}-{val2:02d}"
+            return f"{y:04d}-{val2:02d}-{val1:02d}"
 
     # Pattern 2.4: Written date formats: Month DD, YYYY or DD Month YYYY
     m4 = re.search(
@@ -152,7 +152,7 @@ def parse_date_to_iso(text: str) -> Optional[str]:
         w_clean = w.strip(' \t\n\r"\'.,:-/')
         if len(w_clean) >= 8:
             try:
-                dt = dateutil.parser.parse(w_clean, fuzzy=True, dayfirst=False)
+                dt = dateutil.parser.parse(w_clean, fuzzy=True, dayfirst=True)
                 if 2020 <= dt.year <= 2035:
                     return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d}"
             except Exception:
