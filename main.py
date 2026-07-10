@@ -196,32 +196,44 @@ def parse_amount_and_tax(text: str) -> Tuple[Optional[float], Optional[float]]:
         if val is not None and val not in (2025.0, 2026.0, 2027.0):
             floats.append(val)
             
-    # Search for Subtotal keyword
+    # Search for Subtotal keyword (mapping "amount" here)
     subtotal_match = re.search(
-        r'\b(?:sub[- ]?total|net[- ]?amount|before[- ]?tax)[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b',
+        r'\b(?:sub[- ]?total|net[- ]?amount|before[- ]?tax|amount)[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b',
         text,
         re.IGNORECASE
     )
     if subtotal_match:
         subtotal = extract_float(subtotal_match.group(1))
         
-    # Search for Tax keyword (excluding identifiers like Tax ID, Tax No, etc.)
-    tax_match = re.search(
-        r'\b(?:gst|vat|sales[- ]?tax|service[- ]?tax|tax|cgst|sgst|igst)(?!\s*[-_]?\s*(?:id|no|number|code|reg|tin|gstin|rate|percentage|percent|in|invoice|bill|receipt|doc|document)\b)(?:\s*\(\d+%\))?[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b',
-        text,
-        re.IGNORECASE
-    )
-    if tax_match:
-        tax = extract_float(tax_match.group(1))
-        
-    # Search for Total keyword (including just "Amount:")
+    # Search for Total keyword (excluding just "amount" to map it to subtotal)
     total_match = re.search(
-        r'\b(?:total|grand[- ]?total|amount[- ]?due|balance[- ]?due|payable|amount)[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b',
+        r'\b(?:total|grand[- ]?total|amount[- ]?due|balance[- ]?due|payable)[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b',
         text,
         re.IGNORECASE
     )
     if total_match:
         total = extract_float(total_match.group(1))
+        
+    # Search for Tax keyword using finditer to handle duplicates/ID matches
+    tax_pattern = r'\b(?:gst|vat|sales[- ]?tax|service[- ]?tax|tax|cgst|sgst|igst)(?!\s*[-_]?\s*(?:id|no|number|code|reg|tin|gstin|rate|percentage|percent|in|invoice|bill|receipt|doc|document)\b)(?:\s*\(\d+%\))?[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b'
+    
+    tax_candidates = []
+    for m in re.finditer(tax_pattern, text, re.IGNORECASE):
+        val = extract_float(m.group(1))
+        if val is not None:
+            tax_candidates.append(val)
+            
+    # Filter tax candidates to find a reasonable tax amount (less than subtotal or total)
+    valid_taxes = []
+    for t_val in tax_candidates:
+        if subtotal is not None and t_val >= subtotal * 0.9:
+            continue
+        if total is not None and t_val >= total * 0.9:
+            continue
+        valid_taxes.append(t_val)
+        
+    if valid_taxes:
+        tax = valid_taxes[0]
         
     # Mathematical reconstruction/validation
     if subtotal is None and total is not None and tax is not None:
