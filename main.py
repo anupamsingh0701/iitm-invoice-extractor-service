@@ -294,9 +294,10 @@ def parse_vendor(text: str) -> Optional[str]:
     return None
 
 def parse_invoice_no(text: str) -> Optional[str]:
-    m1 = re.search(r'\b(?:invoice\s+(?:no\.?|number|#|code)|inv\s+(?:no\.?|#))[:\s]*([a-zA-Z0-9\-_]+)', text, re.IGNORECASE)
-    if m1:
-        return m1.group(1).strip()
+    pattern = r'\b(?:invoice\b|inv\b|bill\b|receipt\b|reference\b|ref\b)(?:\s+(?:no\.?|number|#|code|num))?[:\s\-#]*((?!(?:date|due|amount|total|tax|to|for|gst|vat|rs|inr|usd)\b)[a-zA-Z0-9\-_]+)\b'
+    m = re.search(pattern, text, re.IGNORECASE)
+    if m:
+        return m.group(1).strip()
         
     m2 = re.search(r'\b(INV-[a-zA-Z0-9\-_]+)\b', text, re.IGNORECASE)
     if m2:
