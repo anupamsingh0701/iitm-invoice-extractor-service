@@ -198,7 +198,7 @@ def parse_amount_and_tax(text: str) -> Tuple[Optional[float], Optional[float]]:
             
     # Search for Subtotal keyword
     subtotal_match = re.search(
-        r'\b(?:sub[- ]?total|net[- ]?amount|before[- ]?tax)[:\s]*([A-Za-z.$€£₹]*\s*[\d,]+(?:\.\d+)?)\b',
+        r'\b(?:sub[- ]?total|net[- ]?amount|before[- ]?tax)[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b',
         text,
         re.IGNORECASE
     )
@@ -207,7 +207,7 @@ def parse_amount_and_tax(text: str) -> Tuple[Optional[float], Optional[float]]:
         
     # Search for Tax keyword
     tax_match = re.search(
-        r'\b(?:gst|vat|sales[- ]?tax|service[- ]?tax|tax|cgst|sgst|igst)(?:\s*\(\d+%\))?[:\s]*([A-Za-z.$€£₹]*\s*[\d,]+(?:\.\d+)?)\b',
+        r'\b(?:gst|vat|sales[- ]?tax|service[- ]?tax|tax|cgst|sgst|igst)(?:\s*\(\d+%\))?[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b',
         text,
         re.IGNORECASE
     )
@@ -216,7 +216,7 @@ def parse_amount_and_tax(text: str) -> Tuple[Optional[float], Optional[float]]:
         
     # Search for Total keyword (including just "Amount:")
     total_match = re.search(
-        r'\b(?:total|grand[- ]?total|amount[- ]?due|balance[- ]?due|payable|amount)[:\s]*([A-Za-z.$€£₹]*\s*[\d,]+(?:\.\d+)?)\b',
+        r'\b(?:total|grand[- ]?total|amount[- ]?due|balance[- ]?due|payable|amount)[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b',
         text,
         re.IGNORECASE
     )
