@@ -205,9 +205,9 @@ def parse_amount_and_tax(text: str) -> Tuple[Optional[float], Optional[float]]:
     if subtotal_match:
         subtotal = extract_float(subtotal_match.group(1))
         
-    # Search for Tax keyword
+    # Search for Tax keyword (excluding identifiers like Tax ID, Tax No, etc.)
     tax_match = re.search(
-        r'\b(?:gst|vat|sales[- ]?tax|service[- ]?tax|tax|cgst|sgst|igst)(?:\s*\(\d+%\))?[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b',
+        r'\b(?:gst|vat|sales[- ]?tax|service[- ]?tax|tax|cgst|sgst|igst)(?!\s*[-_]?\s*(?:id|no|number|code|reg|tin|gstin|rate|percentage|percent|in|invoice|bill|receipt|doc|document)\b)(?:\s*\(\d+%\))?[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b',
         text,
         re.IGNORECASE
     )
