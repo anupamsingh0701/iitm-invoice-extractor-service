@@ -215,7 +215,7 @@ def parse_amount_and_tax(text: str) -> Tuple[Optional[float], Optional[float]]:
         total = extract_float(total_match.group(1))
         
     # Search for Tax keyword using finditer to handle duplicates/ID matches
-    tax_pattern = r'\b(?:gst|vat|sales[- ]?tax|service[- ]?tax|tax|cgst|sgst|igst)(?!\s*[-_]?\s*(?:id|no|number|code|reg|tin|gstin|rate|percentage|percent|in|invoice|bill|receipt|doc|document)\b)(?:\s*\(\d+%\))?[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b'
+    tax_pattern = r'\b(?:gst|vat|sales[- ]?tax|service[- ]?tax|tax|cgst|sgst|igst)(?!\s*[-_]?\s*(?:id|no|number|code|reg|tin|gstin|rate|percentage|percent|in|invoice|bill|receipt|doc|document)\b)(?:\s*\(?\d+(?:\.\d+)?\s*%\)?)?[:\s]*([A-Za-z.$€£₹]{0,3}\s*[\d,]+(?:\.\d+)?)\b'
     
     tax_candidates = []
     for m in re.finditer(tax_pattern, text, re.IGNORECASE):
